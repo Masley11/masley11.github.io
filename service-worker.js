@@ -4,7 +4,7 @@ const filesToCache = [
   '/index.html',
   '/manifest.json',
   '/icon',
-  '/maskable.png'
+  '/maskable.png',q
   '/monochrome.png'
 ];
 
