@@ -1,41 +1,46 @@
-const CACHE_NAME = 'GMX LoginCalc-v1';
-const urlsToCache = [
+const cacheName = 'GMX LogiCalc-v1.2';
+const filesToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.png',
-  // Ajoute d'autres fichiers ici si nécessaire
+  '/icon',
+  '/maskable.png'
+  '/monochrome.png'
 ];
 
-// Installation du service worker
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
+// Installation : on met en cache les fichiers listés, en ignorant les erreurs individuelles
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(cacheName).then(async (cache) => {
+      for (const file of filesToCache) {
+        try {
+          await cache.add(file);
+        } catch (err) {
+          console.warn('Échec du caching du fichier:', file, err);
+        }
+      }
     })
   );
 });
 
-// Activation et nettoyage des anciens caches
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames =>
+// Activation : nettoyage des anciennes caches
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) =>
       Promise.all(
-        cacheNames.map(name => {
-          if (name !== CACHE_NAME) {
-            return caches.delete(name);
-          }
-        })
+        keys
+          .filter(key => key !== cacheName)
+          .map(key => caches.delete(key))
       )
     )
   );
 });
 
-// Interception des requêtes
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response =>
-      response || fetch(event.request)
-    )
+// Interception des requêtes : réponse par le cache si possible, sinon fetch réseau
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((response) => {
+      return response || fetch(e.request);
+    })
   );
 });
