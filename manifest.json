@@ -1,0 +1,16 @@
+{
+  "name": "GMX LoginCalc",
+  "short_name": "GMX LoginCalc",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "version": "1.2"
+}

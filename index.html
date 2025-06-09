@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#333333" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GMX LogiCalc</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f2f5;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #aaa;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background: #2980b9;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #3498db;
+        }
+        #result {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+        #result.profit-low {
+            background: #f2dede;
+            color: #a94442;
+        }
+        #result.profit-medium {
+            background: #fcf8e3;
+            color: #8a6d3b;
+        }
+        #result.profit-high {
+            background: #dff0d8;
+            color: #3c763d;
+        }
+        #result.profit-excellent {
+            background: #d9edf7;
+            color: #31708f;
+        }
+    </style>
+</head>
+<body>
+
+<h1>GMX LoginCalc</h1>
+
+<form id="calcForm">
+    <label for="fuelPrice">Prix du carburant (€/litre)</label>
+    <input type="number" id="fuelPrice" min="0" step="0.01" required />
+
+    <label for="distance">Distance du trajet (km)</label>
+    <input type="number" id="distance" min="1" step="1" required />
+
+    <label for="revenue">Revenu du trajet (€)</label>
+    <input type="number" id="revenue" min="0" step="0.01" required />
+
+    <label for="consumption">Consommation du camion (km/litre)</label>
+    <input type="number" id="consumption" min="0.1" step="0.01" required />
+
+    <button type="submit">Calculer la rentabilité</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker enregistré.', reg))
+                .catch(err => console.log('Erreur Service Worker :', err));
+        });
+    }
+
+    document.getElementById('calcForm').addEventListener('submit', function(event){
+        event.preventDefault();
+        const fuelPrice = parseFloat(document.getElementById('fuelPrice').value);
+        const distance = parseFloat(document.getElementById('distance').value);
+        const revenue = parseFloat(document.getElementById('revenue').value);
+        const consumption = parseFloat(document.getElementById('consumption').value);
+
+        const fuelCost = (distance / consumption) * fuelPrice;
+        const profit = revenue - fuelCost;
+        const profitPercent = (profit / revenue) * 100;
+
+        let message = `Coût carburant : €${fuelCost.toFixed(2)}<br>`;
+        message += `Profit net : €${profit.toFixed(2)}<br>`;
+        message += `Rentabilité : ${profitPercent.toFixed(2)}%`;
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = message;
+        resultDiv.style.display = 'block';
+        
+        // Réinitialiser toutes les classes
+        resultDiv.className = '';
+        
+        // Appliquer la classe appropriée selon le pourcentage
+        if (profitPercent < 80) {
+            resultDiv.classList.add('profit-low');
+            message += `<br><br><strong>Attention : Rentabilité faible (${profitPercent.toFixed(2)}%)</strong>`;
+        } else if (profitPercent >= 80 && profitPercent < 90) {
+            resultDiv.classList.add('profit-medium');
+            message += `<br><br><strong>Rentabilité moyenne (${profitPercent.toFixed(2)}%)</strong>`;
+        } else if (profitPercent >= 90 && profitPercent < 95) {
+            resultDiv.classList.add('profit-high');
+            message += `<br><br><strong>Bonne rentabilité (${profitPercent.toFixed(2)}%)</strong>`;
+        } else {
+            resultDiv.classList.add('profit-excellent');
+            message += `<br><br><strong>Excellente rentabilité (${profitPercent.toFixed(2)}%)</strong>`;
+        }
+        
+        resultDiv.innerHTML = message;
+    });
+
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault(); // Empêche le prompt automatique
+        deferredPrompt = e;
+
+        const installBtn = document.getElementById('installBtn');
+        installBtn.style.display = 'block';
+
+        installBtn.addEventListener('click', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Utilisateur a accepté l\'installation');
+                } else {
+                    console.log('Utilisateur a refusé l\'installation');
+                }
+                deferredPrompt = null;
+            });
+        });
+    });
+</script>
+<button id="installBtn" style="display:none; position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+    Installer l'app
+</button>
+</body>
+</html>
