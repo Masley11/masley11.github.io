@@ -1,5 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target" : { "namespace": "android_app", "package_name": "com.gamemasterx.logicalc",
-               "sha256_cert_fingerprints": ["DC:E7:FF:30:2B:7F:63:63:6A:09:70:96:8D:16:8B:B5:56:8A:68:DB:09:D6:54:9C:F5:AF:AD:5C:72:38:6F:A7"] }
-}]
