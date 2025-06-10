@@ -8,6 +8,7 @@ const filesToCache = [
   '/monochrome.png'
 ];
 
+
 // Installation : on met en cache les fichiers listés, en ignorant les erreurs individuelles
 self.addEventListener('install', (e) => {
   e.waitUntil(
