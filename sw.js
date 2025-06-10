@@ -1,47 +1,31 @@
-const cacheName = 'GMX LogiCalc-v1.2';
-const filesToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon',
-  '/maskable.png',q
-  '/monochrome.png'
+const CACHE_NAME = 'GMX-v2';
+const ASSETS = [
+    '/',
+    '/index.html',
+    '/manifest.json',
+    '/assets/css/style.css',
+    '/assets/js/app.js',
+    '/assets/img/icon.png',
+    '/assets/img/maskable.png',
+    '/assets/img/monochrome.png'
 ];
 
-
-// Installation : on met en cache les fichiers listés, en ignorant les erreurs individuelles
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(cacheName).then(async (cache) => {
-      for (const file of filesToCache) {
-        try {
-          await cache.add(file);
-        } catch (err) {
-          console.warn('Échec du caching du fichier:', file, err);
-        }
-      }
-    })
-  );
+    e.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(ASSETS))
+            .then(() => self.skipWaiting())
+    );
 });
 
-// Activation : nettoyage des anciennes caches
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter(key => key !== cacheName)
-          .map(key => caches.delete(key))
-      )
-    )
-  );
-});
-
-// Interception des requêtes : réponse par le cache si possible, sinon fetch réseau
 self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
-    })
-  );
+    e.respondWith(
+        caches.match(e.request)
+            .then(cached => cached || fetch(e.request))
+            .catch(() => {
+                if (e.request.mode === 'navigate') {
+                    return caches.match('/index.html');
+                }
+            })
+    );
 });
