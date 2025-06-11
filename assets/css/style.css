@@ -92,19 +92,13 @@ button:hover {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    background: #2ecc71;
+    background: #2980b9; /* Bleu original */
     color: white;
     border: none;
     border-radius: 5px;
     z-index: 1000;
 }
+
+#installBtn:hover {
+    background: #3498db;
 }
-body {
-‎    font-family: Arial, sans-serif;
-‎    margin: 20px;
-‎    background: #f0f2f5; /* Votre bleu clair */
-‎    color: #333;
-‎}
-‎#installBtn {
-‎    background: #2980b9; /* Bleu vif comme dans votre version */
-‎}
