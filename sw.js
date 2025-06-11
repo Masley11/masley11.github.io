@@ -1,4 +1,4 @@
-const CACHE_NAME = 'GMX-v2';
+const CACHE_NAME = 'GMX LogiCalc-v4';
 const ASSETS = [
     '/',
     '/index.html',
